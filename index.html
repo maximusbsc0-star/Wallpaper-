@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallora — Wallpaper Maker</title>
+<style>
+:root{--bg:#0c1020;--panel:#171d32;--muted:#aab3ca;--text:#f6f7fb;--accent:#8b7cff;--accent2:#35d6c5}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0%,#25204b 0,transparent 32%),var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}
+header{padding:22px clamp(16px,4vw,48px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff14}
+.logo{font-size:1.35rem;font-weight:850;letter-spacing:.4px}.logo span{color:var(--accent2)}
+.badge{font-size:.78rem;color:#c8c1ff;border:1px solid #8b7cff66;padding:7px 11px;border-radius:99px}
+main{max-width:1250px;margin:auto;padding:28px clamp(14px,3vw,32px) 50px}
+.intro h1{font-size:clamp(1.8rem,4vw,3rem);margin:0 0 8px}.intro p{color:var(--muted);margin:0 0 24px}
+.layout{display:grid;grid-template-columns:minmax(280px,370px) 1fr;gap:22px;align-items:start}
+.panel{background:linear-gradient(145deg,#1a2139,#141a2d);border:1px solid #ffffff15;border-radius:20px;padding:20px;box-shadow:0 15px 45px #0003}
+h2{font-size:1.05rem;margin:0 0 16px}.group{margin-bottom:18px}.group label{display:block;font-size:.88rem;color:#dce2f3;margin-bottom:8px}
+input[type=text],textarea,select{width:100%;background:#0e1427;color:white;border:1px solid #ffffff24;border-radius:11px;padding:11px 12px;font:inherit;outline:none}
+textarea{min-height:76px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+.row{display:flex;gap:9px}.row>*{flex:1;min-width:0}
+button,.upload{border:0;border-radius:11px;padding:11px 13px;font:inherit;font-weight:700;cursor:pointer;transition:.18s}
+button:hover,.upload:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.primary{background:linear-gradient(100deg,var(--accent),#6355e8);color:white;width:100%}
+.secondary{background:#293250;color:#f3f5ff}.danger{background:#49283a;color:#ffd8e7}
+input[type=color]{width:100%;height:42px;border:1px solid #ffffff24;border-radius:10px;background:#0e1427;padding:4px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=file]{display:none}.upload{display:block;text-align:center;background:#293250;color:#fff}
+.hint{font-size:.78rem;line-height:1.5;color:var(--muted);margin-top:7px}
+.preview-panel{padding:18px}.preview-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.preview-head h2{margin:0}.canvas-wrap{display:flex;justify-content:center;align-items:center;background:#0a0e1b;border:1px solid #ffffff15;border-radius:16px;padding:16px;min-height:480px;overflow:hidden}
+canvas{display:block;max-width:100%;max-height:72vh;object-fit:contain;border-radius:7px;box-shadow:0 14px 38px #0008}
+.actions{display:flex;gap:10px;margin-top:14px}.actions button{flex:1}
+.preset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.preset{height:55px;border:2px solid transparent;border-radius:10px;padding:0}
+.preset.active{border-color:white;outline:2px solid var(--accent)}
+.notice{background:#2b2945;border:1px solid #8b7cff55;padding:12px;border-radius:12px;color:#e1ddff;font-size:.82rem;line-height:1.5}
+.small-title{font-size:.78rem;color:var(--muted);margin:0 0 9px}
+footer{text-align:center;color:#77819c;font-size:.78rem;padding:20px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.canvas-wrap{min-height:320px}canvas{max-height:65vh}}
+</style>
+</head>
+<body>
+<header><div class="logo">WALL<span>ORA</span></div><div class="badge">YOUR WALLPAPER STUDIO</div></header>
+<main>
+<section class="intro"><h1>Create a wallpaper that feels like you.</h1><p>Choose a style, add your photo or text, customise it and download.</p></section>
+<div class="layout">
+<aside class="panel">
+<h2>✦ Design your wallpaper</h2>
+<div class="group">
+<label for="prompt">Describe your idea</label>
+<textarea id="prompt" placeholder="Example: A majestic tiger in a misty forest, cinematic lighting..."></textarea>
+<div class="hint">Prompt ideas can guide your design. Real AI image generation needs an image-generation API/backend; this static version creates editable designs in your browser.</div>
+</div>
+<div class="group"><label>Background style</label>
+<div class="preset-grid" id="presets">
+<button class="preset active" data-style="aurora" title="Aurora" style="background:linear-gradient(135deg,#152b70,#a04c9b,#31c7b2)"></button>
+<button class="preset" data-style="sunset" title="Sunset" style="background:linear-gradient(135deg,#ff9966,#ff5e62,#5b2c83)"></button>
+<button class="preset" data-style="ocean" title="Ocean" style="background:linear-gradient(135deg,#041e42,#087eaa,#5de0e6)"></button>
+<button class="preset" data-style="forest" title="Forest" style="background:linear-gradient(135deg,#092e25,#26845d,#c1a85b)"></button>
+<button class="preset" data-style="midnight" title="Midnight" style="background:linear-gradient(135deg,#050816,#25235c,#8b7cff)"></button>
+<button class="preset" data-style="rose" title="Rose" style="background:linear-gradient(135deg,#4b163f,#d85b87,#ffc1bd)"></button>
+<button class="preset" data-style="fire" title="Fire" style="background:linear-gradient(135deg,#32100c,#db431f,#ffbd54)"></button>
+<button class="preset" data-style="mono" title="Mono" style="background:linear-gradient(135deg,#111,#777,#eee)"></button>
+</div></div>
+<div class="group"><label for="size">Wallpaper size</label><select id="size"><option value="phone">Phone — 1080 × 1920</option><option value="square">Square — 1080 × 1080</option><option value="desktop">Desktop — 1920 × 1080</option></select></div>
+<div class="group"><label for="photo">Add your photo</label><label class="upload" for="photo">＋ Choose image</label><input id="photo" type="file" accept="image/*"><div class="hint">Your selected image stays in this browser session.</div></div>
+<div class="group">
+<label for="filterPreset">Photo filters</label>
+<select id="filterPreset">
+<option value="none">Original</option><option value="grayscale(1)">Black &amp; White</option>
+<option value="sepia(1)">Vintage / Sepia</option><option value="contrast(1.35) saturate(1.25)">Vivid</option>
+<option value="saturate(1.8)">Bright Colours</option><option value="hue-rotate(35deg)">Cool Tone</option>
+<option value="brightness(1.18) contrast(1.08)">Bright</option>
+</select>
+<div class="hint">Choose a filter, then fine-tune the photo below.</div>
+</div>
+<div class="group"><label for="brightness">Brightness</label><input id="brightness" type="range" min="50" max="160" value="100"></div>
+<div class="group"><label for="contrast">Contrast</label><input id="contrast" type="range" min="50" max="180" value="100"></div>
+<div class="group"><label for="saturation">Saturation</label><input id="saturation" type="range" min="0" max="200" value="100"></div>
+<div class="group"><label for="blur">Blur</label><input id="blur" type="range" min="0" max="8" value="0"></div>
+<button class="secondary" id="resetFilters" type="button" style="width:100%;margin-bottom:16px">↺ Reset photo filters</button>
+<div class="group"><label for="title">Wallpaper text</label><input id="title" type="text" maxlength="55" placeholder="Enter your name or quote"></div>
+<div class="group"><label for="subtitle">Small subtitle (optional)</label><input id="subtitle" type="text" maxlength="70" placeholder="Your words here"></div>
+<div class="row group"><div><label for="textColor">Text colour</label><input id="textColor" type="color" value="#ffffff"></div><div><label for="fontSize">Text size</label><input id="fontSize" type="range" min="28" max="110" value="58"></div></div>
+<div class="group"><label for="overlay">Background shade</label><input id="overlay" type="range" min="0" max="75" value="18"></div>
+<button class="primary" id="refresh">✦ Create / Update design</button>
+<p class="hint">Tip: upload a photo, then add text to make a personal lock-screen wallpaper.</p>
+</aside>
+<section class="panel preview-panel">
+<div class="preview-head"><h2>Live preview</h2><span class="badge" id="dimensions">1080 × 1920</span></div>
+<div class="canvas-wrap"><canvas id="art" width="540" height="960"></canvas></div>
+<div class="actions"><button class="secondary" id="random">↻ Random style</button><button class="primary" id="download">↓ Download PNG</button></div>
+</section>
+</div>
+</main>
+<footer>WALLORA · Made for your creativity</footer>
+<script>
+const canvas=document.getElementById('art'),ctx=canvas.getContext('2d');
+const styles={
+aurora:['#152b70','#a04c9b','#31c7b2'],sunset:['#ff9966','#ff5e62','#5b2c83'],ocean:['#041e42','#087eaa','#5de0e6'],forest:['#092e25','#26845d','#c1a85b'],midnight:['#050816','#25235c','#8b7cff'],rose:['#4b163f','#d85b87','#ffc1bd'],fire:['#32100c','#db431f','#ffbd54'],mono:['#111111','#777777','#eeeeee']};
+let selected='aurora',photo=null;
+const $=id=>document.getElementById(id);
+function dimensions(){let v=$('size').value;return v==='square'?[1080,1080]:v==='desktop'?[1920,1080]:[1080,1920]}
+function fitText(text,maxWidth,size){ctx.font=`800 ${size}px Arial`;while(ctx.measureText(text).width>maxWidth&&size>18){size-=2;ctx.font=`800 ${size}px Arial`}return size}
+function draw(){
+ const [W,H]=dimensions();canvas.width=W/2;canvas.height=H/2;const w=canvas.width,h=canvas.height;
+ let c=styles[selected];let g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,c[0]);g.addColorStop(.55,c[1]);g.addColorStop(1,c[2]);ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+ // Soft decorative light orbs
+ for(let i=0;i<9;i++){let x=(i*137+65)%w,y=(i*211+90)%h,r=Math.min(w,h)*(.07+(i%3)*.035);let rg=ctx.createRadialGradient(x,y,0,x,y,r);rg.addColorStop(0,'rgba(255,255,255,.18)');rg.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=rg;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+ if(photo){
+  let iw=photo.width,ih=photo.height,scale=Math.max(w/iw,h/ih),dw=iw*scale,dh=ih*scale;
+  const preset=$('filterPreset').value;
+  const filter=preset==='none'?'':preset+' ';
+  ctx.save();
+  ctx.globalAlpha=.88;
+  ctx.filter=filter+`brightness(${$('brightness').value}%) contrast(${$('contrast').value}%) saturate(${$('saturation').value}%) blur(${$('blur').value}px)`;
+  ctx.drawImage(photo,(w-dw)/2,(h-dh)/2,dw,dh);
+  ctx.restore();
+}
+ let shade=Number($('overlay').value)/100;ctx.fillStyle=`rgba(0,0,0,${shade})`;ctx.fillRect(0,0,w,h);
+ // subtle frame
+ ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=2;ctx.strokeRect(22,22,w-44,h-44);
+ let title=$('title').value.trim(),sub=$('subtitle').value.trim(),color=$('textColor').value;
+ if(title||sub){let base=Number($('fontSize').value)/2;let y=h*.72;ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=14;ctx.fillStyle=color;
+ if(title){let size=fitText(title,w*.84,base);ctx.font=`800 ${size}px Arial`;ctx.fillText(title,w/2,y)}
+ if(sub){ctx.font=`500 ${Math.max(15,base*.34)}px Arial`;ctx.fillText(sub,w/2,y+base*.9)}
+ ctx.shadowBlur=0}
+ $('dimensions').textContent=`${W} × ${H}`;
+}
+document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.preset').forEach(x=>x.classList.remove('active'));b.classList.add('active');selected=b.dataset.style;draw()}));
+['size','title','subtitle','textColor','fontSize','overlay','filterPreset','brightness','contrast','saturation','blur'].forEach(id=>$(id).addEventListener('input',draw));
+$('resetFilters').addEventListener('click',()=>{
+ $('filterPreset').value='none';$('brightness').value=100;$('contrast').value=100;
+ $('saturation').value=100;$('blur').value=0;draw();
+});
+$('photo').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let img=new Image();img.onload=()=>{photo=img;draw()};img.src=URL.createObjectURL(f)});
+$('refresh').addEventListener('click',draw);
+$('random').addEventListener('click',()=>{let keys=Object.keys(styles);selected=keys[Math.floor(Math.random()*keys.length)];document.querySelectorAll('.preset').forEach(x=>x.classList.toggle('active',x.dataset.style===selected));draw()});
+$('download').addEventListener('click',()=>{draw();let a=document.createElement('a');a.download='my-wallpaper.png';a.href=canvas.toDataURL('image/png');a.click()});
+draw();
+</script>
+</body></html>
